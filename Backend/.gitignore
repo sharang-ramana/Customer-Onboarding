@@ -1,0 +1,45 @@
+# Java-related files
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.idea/
+.vscode/
+/out/
+/target/
+
+# Compiled source
+/bin/
+/build/
+
+# Dependency directories
+/.gradle/
+/maven/
+/.mvn/
+
+# Spring Boot configuration
+*.log
+
+# IDE-specific files
+*.ipr
+*.iws
+*.idea/
+
+# Compiled output
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+logs/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Maven Wrapper
+mvnw
+mvnw.cmd
