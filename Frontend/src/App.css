@@ -1,3 +1,5 @@
+@import "~font-awesome/css/font-awesome.min.css";
+
 .App {
   text-align: center;
   display: flex;
@@ -5,7 +7,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  background-color: #040531; /* Background color */
+  background-color: #040531;
 }
 
 .auth-form-container, .login-form, .register-form {
@@ -16,7 +18,7 @@
 @media screen and (min-width: 600px) {
   .auth-form-container {
     padding: 5rem;
-    border: 1px solid #122062; /* Border color */
+    border: 1px solid #122062;
     border-radius: 10px;
     margin: 0.5rem;
   }
@@ -32,13 +34,13 @@ input {
   padding: 1rem;
   border: none;
   border-radius: 10px;
-  background-color: #0e1955; /* Input background color */
-  color: white; /* Input text color */
+  background-color: #0e1955;
+  color: white;
 }
 
 button {
   border: none;
-  background-color: #0168b3; /* Button background color */
+  background-color: #0168b3;
   padding: 20px;
   border-radius: 10px;
   cursor: pointer;
@@ -48,7 +50,7 @@ button {
 }
 
 button:hover {
-  background-color: #122062; /* Darker button background color on hover */
+  background-color: #122062;
 }
 
 .link-btn {
@@ -58,10 +60,139 @@ button:hover {
 }
 
 .button-spacing {
-  margin: 0.5rem; /* Adjust the spacing as needed */
+  margin: 0.5rem;
 }
 
 .welcome-email-content {
-  text-align: left; /* Set the alignment to left */
-  /* Add more styles here if needed */
+  text-align: left;
+}
+
+select {
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: #0e1955;
+  color: white;
+}
+
+textarea {
+  margin: 0.5rem 0;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: #0e1955;
+  color: white;
+}
+
+input[type="date"]::before,
+select::before {
+  content: attr(placeholder);
+  color: #a0a0a0;
+}
+
+input[type="date"]:not(:placeholder-shown),
+select:not(:placeholder-shown) {
+  color: #ffffff;
+}
+
+select::after {
+  content: "\25BC";
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #a0a0a0;
+}
+
+#dateOfBirth::placeholder,
+#gender::placeholder {
+  color: #a0a0a0;
+}
+
+.consent-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.consent-checkbox input {
+  margin-right: 10px;
+}
+
+.file-input {
+  margin-bottom: 10px;
+}
+
+/* CSS for the verification screen */
+.verification-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.animation-container {
+  display: inline-block;
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 20px;
+}
+
+.rotation-animation .arrow {
+  width: 0;
+  height: 0;
+  border: 20px solid transparent;
+  border-top: 20px solid white;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.success-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0px;
+}
+
+.tick-mark {
+  margin-top: 0px;
+  font-size: 64px;
+  color: green;
+}
+
+.success-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.success-message {
+  font-size: 24px;
+  color: green;
+  white-space: nowrap;
+  margin-top: 5px;
+}
+
+.next-button {
+  background-color: #0168b3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+
+.next-button:hover {
+  background-color: #122062;
 }

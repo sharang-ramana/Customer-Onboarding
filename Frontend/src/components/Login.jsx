@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { api } from "./Api"; // Import the api functions
-import { LoginSuccess } from "./LoginSuccess"; // Import the new component
+import { api } from "../Api"; 
+import { LoginSuccess } from "./LoginSuccess"; 
 
 
 export const Login = (props) => {
     const [email, setEmail] = useState('');
     const [pass, setPass] = useState('');
-    const [loginSuccess, setLoginSuccess] = useState(false); // Track login success state
+    const [loginSuccess, setLoginSuccess] = useState(false); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +21,7 @@ export const Login = (props) => {
     
           if (response.success) {
             console.log("Login successful:", response.message);
-            setLoginSuccess(true); // Update login success state
+            setLoginSuccess(true);
           } else {
             console.error("Login failed:", response.error);
           }
@@ -34,7 +34,7 @@ export const Login = (props) => {
     return (
         <div className="auth-form-container">
           {loginSuccess ? (
-            <LoginSuccess /> // Show the success message component
+            <LoginSuccess />
           ) : (
             <div>
               <h2>Login</h2>
