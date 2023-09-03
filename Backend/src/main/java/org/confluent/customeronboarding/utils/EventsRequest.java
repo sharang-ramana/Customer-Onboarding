@@ -15,6 +15,15 @@ public class EventsRequest {
         this.emailId = emailId;
     }
 
+    @Override
+    public String toString() {
+        return "EventsRequest{" +
+                "emailId='" + emailId + '\'' +
+                ", message='" + message + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
     public String getMessage() {
         return message;
     }

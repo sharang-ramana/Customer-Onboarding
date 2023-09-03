@@ -10,6 +10,7 @@ public class SignupRequest {
     private String phone;
     private String address;
     private String ssn;
+    private String isConsentsAgreed;
     private boolean isIdentityVerified;
     private boolean isCreditCheckVerified;
     private String securityQuestion;
@@ -89,6 +90,14 @@ public class SignupRequest {
 
     public void setSsn(String ssn) {
         this.ssn = ssn;
+    }
+
+    public String getIsConsentsAgreed() {
+        return isConsentsAgreed;
+    }
+
+    public void setIsConsentsAgreed(String isConsentsAgreed) {
+        this.isConsentsAgreed = isConsentsAgreed;
     }
 
     public boolean isIdentityVerified() {
