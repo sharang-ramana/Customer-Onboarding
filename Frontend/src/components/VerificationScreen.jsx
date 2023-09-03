@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../Api";
 
 const VerificationScreen = () => {
   const [verificationStep, setVerificationStep] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const stepTitles = [
+    "Verifying your Identity!!",
+    "Verifying your Credit!!",
+    "Hurray!!",
+  ];
 
   useEffect(() => {
     const dataFromPreviousScreen = location.state;
@@ -15,7 +22,18 @@ const VerificationScreen = () => {
       if (verificationStep < 2) {
         setVerificationStep(verificationStep + 1);
       } else {
-        navigate("/signup/security-question", { state: dataFromPreviousScreen });
+        api
+          .sendEvent(
+            dataFromPreviousScreen.emailId,
+            "Identity and Credit Verification",
+            "success"
+          )
+          .then((eventResponse) => {
+            console.log("Event Response:", eventResponse);
+          })
+          .catch((error) => {
+            console.error("Error sending event:", error);
+          });
       }
     }, 3000);
 
@@ -24,7 +42,7 @@ const VerificationScreen = () => {
 
   return (
     <div className="verification-container">
-      <h2>Verifying Your Identity</h2>
+      <h2>{stepTitles[verificationStep]}</h2>
       <div className="animation-container">
         {verificationStep === 0 && (
           <div className="rotation-animation">
@@ -42,8 +60,20 @@ const VerificationScreen = () => {
             <div className="success-message-container">
               <h2 className="success-message">Verified Successfully!!</h2>
             </div>
-            <button className="next-button" onClick={() => navigate("/signup/security-question", { state: location.state })}>
-              Next
+            <button
+              className="custom-button"
+              type="button"
+              onClick={() =>
+                navigate("/signup/security-question", {
+                  state: {
+                    ...location.state,
+                    isIdentityVerified: true,
+                    isCreditCheckVerified: true,
+                  },
+                })
+              }
+            >
+              Continue
             </button>
           </div>
         )}

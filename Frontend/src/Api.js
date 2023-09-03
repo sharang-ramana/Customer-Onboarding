@@ -12,28 +12,6 @@ export const api = {
     return response.json();
   },
 
-  verifyEmail: async (email) => {
-    const response = await fetch(`${BASE_URL}/verify-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-    return response.json();
-  },
-
-  getWelcomeEmail: async (email) => {
-    const response = await fetch(`${BASE_URL}/welcome-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
-    return response.json();
-  },
-
   login: async (credentials) => {
     const response = await fetch(`${BASE_URL}/login`, {
       method: "POST",
@@ -42,6 +20,24 @@ export const api = {
       },
       body: JSON.stringify(credentials),
     });
+    return response.json();
+  },
+
+  sendEvent: async (emailId, message, status) => {
+    const eventData = {
+      emailId,
+      message,
+      status,
+    };
+
+    const response = await fetch(`${BASE_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(eventData),
+    });
+
     return response.json();
   },
 };

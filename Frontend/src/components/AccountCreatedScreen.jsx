@@ -6,8 +6,8 @@ const AccountCreatedScreen = () => {
     <div className="account-created-container">
       <div className="tick-mark">&#10004;</div>
       <h2>Your account is created successfully!!</h2>
-      <button className="login-button">
-        <Link to="/login">Login</Link>
+      <button className="custom-button">
+        <Link to="/login" className="custom-link">Login</Link>
       </button>
     </div>
   );

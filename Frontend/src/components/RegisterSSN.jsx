@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { api } from "../Api";
 
 const RegisterSSNAndConsent = () => {
   const location = useLocation();
@@ -11,21 +12,36 @@ const RegisterSSNAndConsent = () => {
 
   const prevData = location.state || {};
 
-  const handleNext = () => {
+  const handleNext = async (e) => {
+    e.preventDefault();
+
+    let isConsentsAgreed = false; 
+
+    if (termsConsent && creditCheckConsent) {
+        isConsentsAgreed = true; 
+    }
+
     const UserConsentSSNData = {
         ssn,
-        termsConsent,
-        creditCheckConsent,
+        isConsentsAgreed,
         ...prevData,
       };
   
+    const eventResponse = await api.sendEvent(
+        prevData.emailId,
+        "Gather User's SSN and consents",
+        "success"
+    );
+
+    console.log("Event Response:", eventResponse);
+
     navigate("/signup/SSN-Credit-Verification", { state: UserConsentSSNData });
   };
 
   return (
     <div className="auth-form-container">
       <h2>SSN and Consents</h2>
-      <form className="register-form">
+      <form className="register-form" onSubmit={handleNext}>
         <label htmlFor="ssn">Social Security Number</label>
         <input
           type="text"
@@ -68,9 +84,7 @@ const RegisterSSNAndConsent = () => {
           </label>
         </div>
 
-        <button className="link-btn" type="button" onClick={handleNext}>
-          Submit
-        </button>
+        <button className="custom-button" type="submit">Continue</button>
       </form>
     </div>
   );

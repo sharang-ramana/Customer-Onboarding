@@ -1,25 +1,36 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { api } from "../Api";
 
 const RegisterPersonalInfo = () => {
   const [fullName, setFullName] = useState("");
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dob, setDOB] = useState("");
   const [gender, setGender] = useState("");
-  const [email, setEmail] = useState("");
+  const [emailId, setEmailId] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
   const navigate = useNavigate();
 
-  const handleNext = () => {
+  const handleNext = async (e) => {
+    e.preventDefault();
+
     const userData = {
       fullName,
-      dateOfBirth,
+      dob,
       gender,
-      email,
+      emailId,
       phone,
       address,
     };
+
+    const eventResponse = await api.sendEvent(
+      emailId,
+      "Gather User's Personal Information",
+      "success"
+    );
+
+    console.log("Event Response:", eventResponse);
 
     navigate("/signup/SSN", { state: userData });
   };
@@ -27,7 +38,7 @@ const RegisterPersonalInfo = () => {
   return (
     <div className="auth-form-container">
       <h2>Personal Information</h2>
-      <form className="register-form">
+      <form className="register-form" onSubmit={handleNext}>
         <label htmlFor="fullName">Full Name</label>
         <input
           type="text"
@@ -38,12 +49,12 @@ const RegisterPersonalInfo = () => {
           required
         />
 
-        <label htmlFor="dateOfBirth">Date of Birth</label>
+        <label htmlFor="dob">Date of Birth</label>
         <input
           type="date"
-          id="dateOfBirth"
-          value={dateOfBirth}
-          onChange={(e) => setDateOfBirth(e.target.value)}
+          id="dob"
+          value={dob}
+          onChange={(e) => setDOB(e.target.value)}
           required
         />
 
@@ -60,13 +71,13 @@ const RegisterPersonalInfo = () => {
           <option value="other">Other</option>
         </select>
 
-        <label htmlFor="email">Email</label>
+        <label htmlFor="emailId">emailId</label>
         <input
-          type="email"
-          id="email"
-          placeholder="youremail@example.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="emailId"
+          id="emailId"
+          placeholder="youremailId@example.com"
+          value={emailId}
+          onChange={(e) => setEmailId(e.target.value)}
           required
         />
 
@@ -89,10 +100,10 @@ const RegisterPersonalInfo = () => {
           required
         />
 
-        <button className="link-btn" type="button" onClick={handleNext}>Next</button>
+        <button className="custom-button" type="submit">Continue</button>
       </form>
       <button className="link-btn">
-        <Link to="/login">Already have an account? Login here.</Link>
+        <Link to="/login" className="custom-link">Already have an account? Login here.</Link>
       </button>    
     </div>
   );
