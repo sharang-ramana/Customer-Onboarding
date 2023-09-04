@@ -1,47 +1,44 @@
 package org.confluent.customeronboarding.utils;
 
-import java.util.Date;
+import java.sql.Date;
 
 public class SignupRequest {
-    private String fullName;
+    private String full_name;
     private Date dob;
     private String gender;
-    private String emailId;
+    private String email_id;
     private String phone;
     private String address;
     private String ssn;
-    private String isConsentsAgreed;
-    private boolean isIdentityVerified;
-    private boolean isCreditCheckVerified;
-    private String securityQuestion;
-    private String securityAnswer;
+    private String is_consents_agreed;
+    private boolean is_identity_verified;
+    private boolean is_credit_check_verified;
+    private String security_question;
+    private String security_answer;
     private String password;
 
-    public SignupRequest(String fullName, Date dob, String gender, String emailId, String phone, String address,
-                String ssn, boolean isIdentityVerified, boolean isCreditCheckVerified,
-                String securityQuestion, String securityAnswer, String password) {
-        this.fullName = fullName;
+    public SignupRequest(String full_name, Date dob, String gender, String email_id, String phone, String address, String ssn, String is_consents_agreed, boolean is_identity_verified, boolean is_credit_check_verified, String security_question, String security_answer, String password) {
+        this.full_name = full_name;
         this.dob = dob;
         this.gender = gender;
-        this.emailId = emailId;
+        this.email_id = email_id;
         this.phone = phone;
         this.address = address;
         this.ssn = ssn;
-        this.isIdentityVerified = isIdentityVerified;
-        this.isCreditCheckVerified = isCreditCheckVerified;
-        this.securityQuestion = securityQuestion;
-        this.securityAnswer = securityAnswer;
+        this.is_consents_agreed = is_consents_agreed;
+        this.is_identity_verified = is_identity_verified;
+        this.is_credit_check_verified = is_credit_check_verified;
+        this.security_question = security_question;
+        this.security_answer = security_answer;
         this.password = password;
     }
 
-    // Getters and setters for all fields
-
-    public String getFullName() {
-        return fullName;
+    public String getFull_name() {
+        return full_name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
     }
 
     public Date getDob() {
@@ -60,12 +57,12 @@ public class SignupRequest {
         this.gender = gender;
     }
 
-    public String getEmailId() {
-        return emailId;
+    public String getEmail_id() {
+        return email_id;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setEmail_id(String email_id) {
+        this.email_id = email_id;
     }
 
     public String getPhone() {
@@ -92,44 +89,44 @@ public class SignupRequest {
         this.ssn = ssn;
     }
 
-    public String getIsConsentsAgreed() {
-        return isConsentsAgreed;
+    public String getIs_consents_agreed() {
+        return is_consents_agreed;
     }
 
-    public void setIsConsentsAgreed(String isConsentsAgreed) {
-        this.isConsentsAgreed = isConsentsAgreed;
+    public void setIs_consents_agreed(String is_consents_agreed) {
+        this.is_consents_agreed = is_consents_agreed;
     }
 
-    public boolean isIdentityVerified() {
-        return isIdentityVerified;
+    public boolean isIs_identity_verified() {
+        return is_identity_verified;
     }
 
-    public void setIdentityVerified(boolean identityVerified) {
-        isIdentityVerified = identityVerified;
+    public void setIs_identity_verified(boolean is_identity_verified) {
+        this.is_identity_verified = is_identity_verified;
     }
 
-    public boolean isCreditCheckVerified() {
-        return isCreditCheckVerified;
+    public boolean isIs_credit_check_verified() {
+        return is_credit_check_verified;
     }
 
-    public void setCreditCheckVerified(boolean creditCheckVerified) {
-        isCreditCheckVerified = creditCheckVerified;
+    public void setIs_credit_check_verified(boolean is_credit_check_verified) {
+        this.is_credit_check_verified = is_credit_check_verified;
     }
 
-    public String getSecurityQuestion() {
-        return securityQuestion;
+    public String getSecurity_question() {
+        return security_question;
     }
 
-    public void setSecurityQuestion(String securityQuestion) {
-        this.securityQuestion = securityQuestion;
+    public void setSecurity_question(String security_question) {
+        this.security_question = security_question;
     }
 
-    public String getSecurityAnswer() {
-        return securityAnswer;
+    public String getSecurity_answer() {
+        return security_answer;
     }
 
-    public void setSecurityAnswer(String securityAnswer) {
-        this.securityAnswer = securityAnswer;
+    public void setSecurity_answer(String security_answer) {
+        this.security_answer = security_answer;
     }
 
     public String getPassword() {
@@ -138,24 +135,6 @@ public class SignupRequest {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "fullName='" + fullName + '\'' +
-                ", dob=" + dob +
-                ", gender='" + gender + '\'' +
-                ", emailId='" + emailId + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", ssn='" + ssn + '\'' +
-                ", isIdentityVerified=" + isIdentityVerified +
-                ", isCreditCheckVerified=" + isCreditCheckVerified +
-                ", securityQuestion='" + securityQuestion + '\'' +
-                ", securityAnswer='" + securityAnswer + '\'' +
-                ", password='" + password + '\'' +
-                '}';
     }
 }
 

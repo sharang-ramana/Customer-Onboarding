@@ -3,12 +3,12 @@ package org.confluent.customeronboarding.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-import java.util.Date;
-
+import java.sql.Date;
 @Entity
 public class customer {
     @Id
     private String emailId;
+
     private String fullName;
     private Date dob;
     private String gender;
@@ -21,6 +21,9 @@ public class customer {
     private String securityQuestion;
     private String securityAnswer;
     private String password;
+
+    public customer() {
+    }
 
     public customer(String fullName, Date dob, String gender, String emailId, String phone, String address,
                     String ssn, boolean isIdentityVerified, boolean isCreditCheckVerified,
@@ -109,16 +112,16 @@ public class customer {
         return isIdentityVerified;
     }
 
-    public void setIdentityVerified(boolean identityVerified) {
-        isIdentityVerified = identityVerified;
+    public void setIdentityVerified(boolean isIdentityVerified) {
+        this.isIdentityVerified = isIdentityVerified;
     }
 
     public boolean isCreditCheckVerified() {
         return isCreditCheckVerified;
     }
 
-    public void setCreditCheckVerified(boolean creditCheckVerified) {
-        isCreditCheckVerified = creditCheckVerified;
+    public void setCreditCheckVerified(boolean isCreditCheckVerified) {
+        this.isCreditCheckVerified = isCreditCheckVerified;
     }
 
     public String getSecurityQuestion() {

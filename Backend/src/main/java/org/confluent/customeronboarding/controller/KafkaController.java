@@ -28,12 +28,13 @@ public class KafkaController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> signup(@RequestBody SignupRequest signupRequest) {
+        System.out.println(signupRequest.getDob());
         try {
-            if (signupRequest.getEmailId() == null || signupRequest.getEmailId().isEmpty()) {
+            if (signupRequest.getEmail_id() == null || signupRequest.getEmail_id().isEmpty()) {
                 throw new IllegalArgumentException("Email ID is a mandatory field.");
             }
 
-            kafkaProducerService.sendMessage(signupRequest.getEmailId(), signupRequest, "signup");
+            kafkaProducerService.sendMessage(signupRequest.getEmail_id(), signupRequest, "customer");
 
             ApiResponse response = new ApiResponse();
             response.setSuccess(true);
@@ -57,7 +58,7 @@ public class KafkaController {
             response.setMessage("Login successful.");
 
             Event event = createEvent(loginRequest.getEmail(), "User successfully logged in", "SUCCESS");
-            if (!sendEventToKafka(loginRequest.getEmail(), event, response)) {
+            if (!setFormattedTimestamp(event, response) || !sendEventToKafka(loginRequest.getEmail(), event, response)) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
 
@@ -67,7 +68,7 @@ public class KafkaController {
             response.setError("Invalid credentials.");
 
             Event event = createEvent(loginRequest.getEmail(), "User login failed", "FAILURE");
-            if (!sendEventToKafka(loginRequest.getEmail(), event, response)) {
+            if (!setFormattedTimestamp(event, response) || !sendEventToKafka(loginRequest.getEmail(), event, response)) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
             }
 
@@ -79,19 +80,19 @@ public class KafkaController {
     public ResponseEntity<ApiResponse> sendEvent(@RequestBody EventsRequest eventsRequest) {
         ApiResponse response = new ApiResponse();
 
-        if (eventsRequest.getEmailId() == null || eventsRequest.getEmailId().isEmpty()) {
+        if (eventsRequest.getEmail_id() == null || eventsRequest.getEmail_id().isEmpty()) {
             response.setSuccess(false);
             response.setError("Email ID is required.");
             return ResponseEntity.badRequest().body(response);
         }
 
-        Event event = createEvent(eventsRequest.getEmailId(), eventsRequest.getMessage(), eventsRequest.getStatus());
+        Event event = createEvent(eventsRequest.getEmail_id(), eventsRequest.getMessage(), eventsRequest.getStatus());
 
         if (!setFormattedTimestamp(event, response)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
-        if (!sendEventToKafka(eventsRequest.getEmailId(), event, response)) {
+        if (!sendEventToKafka(eventsRequest.getEmail_id(), event, response)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
 
@@ -102,7 +103,7 @@ public class KafkaController {
 
     private Event createEvent(String email, String message, String status) {
         Event event = new Event();
-        event.setEmailId(email);
+        event.setEmail_id(email);
         event.setMessage(message);
         event.setStatus(status);
         return event;

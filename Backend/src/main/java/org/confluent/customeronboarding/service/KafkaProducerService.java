@@ -2,27 +2,25 @@ package org.confluent.customeronboarding.service;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.KafkaException;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Properties;
 
 @Service
+@PropertySource("classpath:/cc-config.properties")
 public class KafkaProducerService {
 
-    public <T> void sendMessage(String key, T message, String topic) throws IOException {
+    private final Properties props;
 
-        final Properties props;
-        try {
-            props = loadConfig("/path/to/client.properties");
-        } catch (IOException e) {
-            throw new IOException("Error loading Kafka configuration.", e);
-        }
+    public KafkaProducerService() {
+        props = loadProperties();
+    }
 
+    public <T> void sendMessage(String key, T message, String topic) {
         Producer<String, T> producer = new KafkaProducer<>(props);
         ProducerRecord<String, T> record = new ProducerRecord<>(topic, key, message);
         try {
@@ -45,14 +43,13 @@ public class KafkaProducerService {
         }
     }
 
-    private Properties loadConfig(final String configFile) throws IOException {
-        if (!Files.exists(Paths.get(configFile))) {
-            throw new IOException(configFile + " not found.");
+    private Properties loadProperties() {
+        Properties properties = new Properties();
+        try (InputStream inputStream = new ClassPathResource("cc-config.properties").getInputStream()) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading properties from cc-config.properties", e);
         }
-        final Properties cfg = new Properties();
-        try (InputStream inputStream = new FileInputStream(configFile)) {
-            cfg.load(inputStream);
-        }
-        return cfg;
+        return properties;
     }
 }

@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { api } from "../Api";
 
 const RegisterPersonalInfo = () => {
-  const [fullName, setFullName] = useState("");
+  const [full_name, setfull_name] = useState("");
   const [dob, setDOB] = useState("");
   const [gender, setGender] = useState("");
-  const [emailId, setEmailId] = useState("");
+  const [email_id, setemail_id] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
 
@@ -16,16 +16,17 @@ const RegisterPersonalInfo = () => {
     e.preventDefault();
 
     const userData = {
-      fullName,
+      full_name,
       dob,
       gender,
-      emailId,
+      email_id,
       phone,
       address,
     };
 
+    console.log(dob)
     const eventResponse = await api.sendEvent(
-      emailId,
+      email_id,
       "Gather User's Personal Information",
       "success"
     );
@@ -39,13 +40,13 @@ const RegisterPersonalInfo = () => {
     <div className="auth-form-container">
       <h2>Personal Information</h2>
       <form className="register-form" onSubmit={handleNext}>
-        <label htmlFor="fullName">Full Name</label>
+        <label htmlFor="full_name">Full Name</label>
         <input
           type="text"
-          id="fullName"
+          id="full_name"
           placeholder="Full Name"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
+          value={full_name}
+          onChange={(e) => setfull_name(e.target.value)}
           required
         />
 
@@ -71,13 +72,13 @@ const RegisterPersonalInfo = () => {
           <option value="other">Other</option>
         </select>
 
-        <label htmlFor="emailId">emailId</label>
+        <label htmlFor="email_id">email_id</label>
         <input
-          type="emailId"
-          id="emailId"
+          type="email_id"
+          id="email_id"
           placeholder="youremailId@example.com"
-          value={emailId}
-          onChange={(e) => setEmailId(e.target.value)}
+          value={email_id}
+          onChange={(e) => setemail_id(e.target.value)}
           required
         />
 

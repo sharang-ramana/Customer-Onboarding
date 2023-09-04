@@ -4,7 +4,7 @@ import { LoginSuccess } from "./LoginSuccess";
 
 
 export const Login = (props) => {
-    const [email, setEmail] = useState('');
+    const [email_id, setemail_id] = useState('');
     const [pass, setPass] = useState('');
     const [loginSuccess, setLoginSuccess] = useState(false); 
 
@@ -13,7 +13,7 @@ export const Login = (props) => {
     
         try {
           const credentials = {
-            email: email,
+            email_id: email_id,
             password: pass
           };
     
@@ -39,8 +39,8 @@ export const Login = (props) => {
             <div>
               <h2>Login</h2>
               <form className="login-form" onSubmit={handleSubmit}>
-                <label htmlFor="email">Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="youremail@gmail.com" id="email" name="email" />
+                <label htmlFor="email_id">Email</label>
+                <input value={email_id} onChange={(e) => setemail_id(e.target.value)} type="email" placeholder="youremail@gmail.com" id="email_id" name="email_id" />
                 <label htmlFor="password">Password</label>
                 <input value={pass} onChange={(e) => setPass(e.target.value)} type="password" placeholder="********" id="password" name="password" />
                 <button type="submit">Log In</button>

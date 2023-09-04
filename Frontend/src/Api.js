@@ -23,9 +23,9 @@ export const api = {
     return response.json();
   },
 
-  sendEvent: async (emailId, message, status) => {
+  sendEvent: async (email_id, message, status) => {
     const eventData = {
-      emailId,
+      email_id,
       message,
       status,
     };

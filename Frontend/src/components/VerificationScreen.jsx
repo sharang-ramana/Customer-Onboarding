@@ -24,7 +24,7 @@ const VerificationScreen = () => {
       } else {
         api
           .sendEvent(
-            dataFromPreviousScreen.emailId,
+            dataFromPreviousScreen.email_id,
             "Identity and Credit Verification",
             "success"
           )
@@ -67,8 +67,8 @@ const VerificationScreen = () => {
                 navigate("/signup/security-question", {
                   state: {
                     ...location.state,
-                    isIdentityVerified: true,
-                    isCreditCheckVerified: true,
+                    is_identity_verified: true,
+                    is_credit_check_verified: true,
                   },
                 })
               }

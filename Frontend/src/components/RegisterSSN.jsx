@@ -15,20 +15,20 @@ const RegisterSSNAndConsent = () => {
   const handleNext = async (e) => {
     e.preventDefault();
 
-    let isConsentsAgreed = false; 
+    let is_consents_agreed = false; 
 
     if (termsConsent && creditCheckConsent) {
-        isConsentsAgreed = true; 
+        is_consents_agreed = true; 
     }
 
     const UserConsentSSNData = {
         ssn,
-        isConsentsAgreed,
+        is_consents_agreed,
         ...prevData,
       };
   
     const eventResponse = await api.sendEvent(
-        prevData.emailId,
+        prevData.email_id,
         "Gather User's SSN and consents",
         "success"
     );

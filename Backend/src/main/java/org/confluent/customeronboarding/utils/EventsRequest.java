@@ -1,27 +1,22 @@
 package org.confluent.customeronboarding.utils;
 
 public class EventsRequest {
-    private String emailId;
+    private String email_id;
     private String message;
     private String status;
 
-    // Constructors, getters, setters
-
-    public String getEmailId() {
-        return emailId;
+    public EventsRequest(String email_id, String message, String status) {
+        this.email_id = email_id;
+        this.message = message;
+        this.status = status;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public String getEmail_id() {
+        return email_id;
     }
 
-    @Override
-    public String toString() {
-        return "EventsRequest{" +
-                "emailId='" + emailId + '\'' +
-                ", message='" + message + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+    public void setEmail_id(String email_id) {
+        this.email_id = email_id;
     }
 
     public String getMessage() {

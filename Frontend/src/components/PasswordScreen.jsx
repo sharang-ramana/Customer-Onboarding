@@ -26,7 +26,7 @@ const PasswordScreen = () => {
     console.log("Combined Data:", combinedData);
 
     const eventResponse = await api.sendEvent(
-        prevData.emailId,
+        prevData.email_id,
         "Gather User's Password",
         "success"
       );
@@ -40,7 +40,7 @@ const PasswordScreen = () => {
   
         if (signupResponse.success) {
           const eventResponse = await api.sendEvent(
-            prevData.emailId,
+            prevData.email_id,
             "Account Created Successfully",
             "success"
           );
