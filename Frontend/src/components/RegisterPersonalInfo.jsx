@@ -24,7 +24,6 @@ const RegisterPersonalInfo = () => {
       address,
     };
 
-    console.log(dob)
     const eventResponse = await api.sendEvent(
       email_id,
       "Gather User's Personal Information",

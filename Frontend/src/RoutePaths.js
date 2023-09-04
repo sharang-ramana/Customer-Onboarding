@@ -7,7 +7,7 @@ import VerificationScreen from "./components/VerificationScreen.jsx";
 import SecurityQuestionScreen from "./components/SecurityQuestionScreen";
 import PasswordScreen from "./components/PasswordScreen";
 import AccountCreatedScreen from "./components/AccountCreatedScreen";
-import { Login } from "./components/Login";
+import Login from "./components/Login";
 import { LoginSuccess } from "./components/LoginSuccess";
 
 const RoutePaths = () => {
