@@ -24,12 +24,12 @@ resource "confluent_schema_registry_cluster" "essentials" {
 }
 
 #This part creates cluster inside environment
-resource "confluent_kafka_cluster" "basic" {
+resource "confluent_kafka_cluster" "standard" {
   display_name = "Terraform_Dev"
   availability = "SINGLE_ZONE"
   cloud        = "AWS"
   region       = "us-east-2"
-  basic {}
+  standard {}
 
   environment {
     
@@ -48,7 +48,7 @@ resource "confluent_service_account" "app-manager-kafka" {
 resource "confluent_role_binding" "app-manager-kafka-kafka-cluster-admin" {
   principal   = "User:${confluent_service_account.app-manager-kafka.id}"
   role_name   = "CloudClusterAdmin"
-  crn_pattern = confluent_kafka_cluster.basic.rbac_crn
+  crn_pattern = confluent_kafka_cluster.standard.rbac_crn
 }
 
 resource "confluent_api_key" "app-manager-kafka-kafka-api-key" {
@@ -61,9 +61,9 @@ resource "confluent_api_key" "app-manager-kafka-kafka-api-key" {
   }
 
   managed_resource {
-    id          = confluent_kafka_cluster.basic.id
-    api_version = confluent_kafka_cluster.basic.api_version
-    kind        = confluent_kafka_cluster.basic.kind
+    id          = confluent_kafka_cluster.standard.id
+    api_version = confluent_kafka_cluster.standard.api_version
+    kind        = confluent_kafka_cluster.standard.kind
 
     environment {
       id = confluent_environment.development.id
@@ -84,11 +84,24 @@ resource "confluent_api_key" "app-manager-kafka-kafka-api-key" {
 
 resource "confluent_kafka_topic" "customer" {
   kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
+    id = confluent_kafka_cluster.standard.id
   }
   topic_name         = "customer"
   partitions_count   = 6
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_topic" "customer_enriched" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  topic_name         = "customer_enriched"
+  partitions_count   = 6
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
   credentials {
     key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
     secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
@@ -97,11 +110,11 @@ resource "confluent_kafka_topic" "customer" {
 
 resource "confluent_kafka_topic" "events" {
   kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
+    id = confluent_kafka_cluster.standard.id
   }
   topic_name         = "events"
   partitions_count   = 6
-  rest_endpoint = confluent_kafka_cluster.basic.rest_endpoint
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
   credentials {
     key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
     secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
@@ -151,13 +164,309 @@ resource "confluent_api_key" "env-manager-schema-registry-api-key" {
   ]
 }
 
+# setup KSQL
+// ksqlDB service account with only the necessary access
+resource "confluent_service_account" "ksql-manager" {
+  display_name = "ksql-manager"
+  description  = "Service account for Ksql cluster"
+}
+
+resource "confluent_ksql_cluster" "main" {
+  display_name = "ksql_cluster_0"
+  csu = 1
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  credential_identity {
+    id = confluent_service_account.ksql-manager.id
+  }
+  environment {
+    id = confluent_environment.development.id
+  }
+
+  depends_on = [
+    confluent_schema_registry_cluster.essentials,
+    confluent_role_binding.ksql-manager-schema-registry-resource-owner
+  ]
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-on-cluster" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "CLUSTER"
+  resource_name = "kafka-cluster"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-on-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-on-group" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "GROUP"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-configs-on-cluster" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "CLUSTER"
+  resource_name = "kafka-cluster"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE_CONFIGS"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-configs-on-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE_CONFIGS"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-configs-on-group" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "GROUP"
+  resource_name = "*"
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE_CONFIGS"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-describe-on-transactional-id" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TRANSACTIONAL_ID"
+  resource_name = confluent_ksql_cluster.main.topic_prefix
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "DESCRIBE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-write-on-transactional-id" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TRANSACTIONAL_ID"
+  resource_name = confluent_ksql_cluster.main.topic_prefix
+  pattern_type  = "LITERAL"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "WRITE"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-all-on-topic-prefix" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = confluent_ksql_cluster.main.topic_prefix
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-all-on-topic-confluent" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = "_confluent-ksql-${confluent_ksql_cluster.main.topic_prefix}"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-all-on-group-confluent" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "GROUP"
+  resource_name = "_confluent-ksql-${confluent_ksql_cluster.main.topic_prefix}"
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+# Topic specific permissions. You have to add an ACL like this for every Kafka topic you work with.
+resource "confluent_kafka_acl" "ksql-manager-all-on-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = confluent_kafka_topic.customer.topic_name
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_kafka_acl" "ksql-manager-for-customer_enriched-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = confluent_kafka_topic.customer_enriched.topic_name
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
+resource "confluent_role_binding" "ksql-manager-schema-registry-resource-owner" {
+  principal   = "User:${confluent_service_account.ksql-manager.id}"
+  role_name   = "ResourceOwner"
+  crn_pattern = format("%s/%s", confluent_schema_registry_cluster.essentials.resource_name, "subject=*")
+}
+
+# ACLs are needed for KSQL service account to read/write data from/to kafka, this role instead is needed for giving
+# access to the Ksql cluster.
+resource "confluent_role_binding" "ksql-manager-ksql-admin" {
+  principal   = "User:${confluent_service_account.ksql-manager.id}"
+  role_name   = "KsqlAdmin"
+  crn_pattern = confluent_ksql_cluster.main.resource_name
+}
+
+resource "confluent_api_key" "ksql-manager-db-api-key" {
+  display_name = "ksql-manager-db-api-key"
+  description  = "KsqlDB API Key that is owned by 'ksql-manager' service account"
+  owner {
+    id          = confluent_service_account.ksql-manager.id
+    api_version = confluent_service_account.ksql-manager.api_version
+    kind        = confluent_service_account.ksql-manager.kind
+  }
+
+  managed_resource {
+    id          = confluent_ksql_cluster.main.id
+    api_version = confluent_ksql_cluster.main.api_version
+    kind        = confluent_ksql_cluster.main.kind
+
+    environment {
+      id = confluent_environment.development.id
+    }
+  }
+}
+
+
 # Configure Connector
 resource "confluent_connector" "postgres-db-sink" {
   environment {
       id = confluent_environment.development.id
   }
   kafka_cluster {
-    id = confluent_kafka_cluster.basic.id
+    id = confluent_kafka_cluster.standard.id
   }
 
   
@@ -167,7 +476,7 @@ resource "confluent_connector" "postgres-db-sink" {
 
   
   config_nonsensitive = {
-        "topics" = confluent_kafka_topic.customer.topic_name,
+        "topics" = "${confluent_kafka_topic.customer.topic_name},${confluent_kafka_topic.customer_enriched.topic_name}",
         "schema.context.name" = "default",
         "input.data.format" = "JSON_SR",
         "input.key.format" = "STRING",
@@ -185,7 +494,7 @@ resource "confluent_connector" "postgres-db-sink" {
         "insert.mode" = "INSERT",
         "table.types" = "TABLE",
         "db.timezone" = "UTC",
-        "pk.fields" = "event_id",
+        "pk.fields" = "email_id",
         "auto.create" = "false",
         "auto.evolve" = "false",
         "quote.sql.identifiers" = "ALWAYS",
@@ -198,5 +507,5 @@ resource "confluent_connector" "postgres-db-sink" {
         "transforms.transform_0.target.type" = "Date",
         "transforms.transform_0.field" = "dob"
     }
-    depends_on = [ confluent_kafka_topic.customer ]
+    depends_on = [ confluent_kafka_topic.customer, confluent_kafka_topic.customer_enriched ]
 }
