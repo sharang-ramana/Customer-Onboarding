@@ -71,7 +71,7 @@ const RegisterPersonalInfo = () => {
           <option value="other">Other</option>
         </select>
 
-        <label htmlFor="email_id">email_id</label>
+        <label htmlFor="email_id">Email ID</label>
         <input
           type="email_id"
           id="email_id"

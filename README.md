@@ -130,7 +130,7 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
         terraform output resource-ids
         ```
 
-    - Verify the Environment, Cluster, Schema Registry, Topics and Connector created in the Confluent Cloud UI by terraform.
+    - Verify the Environment, Cluster, Schema Registry, KsqlDB, Topics and Connector created in the Confluent Cloud UI by terraform.
 
    > **Note:** Read the `main.tf` configuration file [to see what will be created](./terraform/main.tf).
 
@@ -162,16 +162,54 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
     Fill in the required details on each screen and proceed until you reach the final step, where you'll see the message `Your account is created successfully!`
 
 2. **Event Tracking:**
-    At each step of the signup form, take note that an event is produced to the `events` topic in Confluent Cloud. The record key for each event is your email ID, which you entered on the signup page.
+    At each step of the signup form, take note that an event is produced to the `events` topic in Confluent Cloud. The record key for each event is your email ID, which you entered on the signup page.  
+    **Step 1**
+    <div align="center"> 
+        <img src="images/signup-step-1.jpg" width="100%" height="100%">
+    </div>
+
+    **Step 2**
+    <div align="center"> 
+        <img src="images/signup-step-2.jpg" width="100%" height="100%">
+    </div>
+
+    **Step 3**
+    <div align="center"> 
+        <img src="images/signup-step-3.jpg" width="100%" height="100%">
+    </div>
+
+    **Step 4**
+    <div align="center"> 
+        <img src="images/signup-step-4.jpg" width="100%" height="100%">
+    </div>
+
+    **Step 5**
+    <div align="center"> 
+        <img src="images/signup-step-5.jpg" width="100%" height="100%">
+    </div>
+
+    **Step 6**
+    <div align="center"> 
+        <img src="images/signup-step-6.jpg" width="100%" height="100%">
+    </div>
 
 3. **Customer Data Recording:**
     On the final step of the signup process, you'll notice that a record containing the user details you entered is added to the `customer` topic in Confluent Cloud. Once again, the record key is your email ID.
+    <div align="center"> 
+        <img src="images/signup-step-7.jpg" width="100%" height="100%">
+    </div>
 
 4. **Database Entry:**
     Check the Postgres sink connector created as part of the Terraform setup. It retrieves data from the customer topic and inserts it into the customer table. You should now see an entry in the customer table that matches the details you provided on the UI.
+    <div align="center"> 
+        <img src="images/postgres-customer-entry.png" width="100%" height="100%">
+    </div>
 
 5. **Login:**
     Proceed to the login page in the UI. Enter the customer's email and password, then click the `Login` button to successfully log in.
+    <div align="center"> 
+        <img src="images/login.jpg" width="100%" height="100%">
+    </div>
 
 # Teardown
 
