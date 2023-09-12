@@ -140,7 +140,7 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
     npm install
     npm start
     ```
-    Now the site should be live [here](http://localhost:3000/)
+    The website is now live. You can view it by opening this link in your browser tab [http://localhost:3000/](http://localhost:3000/)
 
 4. Run the Java Backend
     - Add the postgres credentials to the **application.properties** present in this path `Backend/src/main/resources/`
