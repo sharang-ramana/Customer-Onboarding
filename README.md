@@ -215,7 +215,6 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
     If you’re interested in learning more about ksqlDB and the differences between streams and tables, I recommend reading these two blogs [here](https://www.confluent.io/blog/kafka-streams-tables-part-3-event-processing-fundamentals/) and [here](https://www.confluent.io/blog/how-real-time-stream-processing-works-with-ksqldb/).
 
     1. On the navigation menu click on **ksqlDB** and step into the cluster you created during setup.
-   To write streaming queries against topics, you will need to register the topics with ksqlDB as a stream or table.
 
     2. **VERY IMPORTANT** -- At the bottom of the editor, set `auto.offset.reset` to `earliest`, or enter the statement:
 
