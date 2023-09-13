@@ -6,7 +6,7 @@
 In today's fast-paced digital landscape, organizations from various industries are harnessing technology to deliver exceptional customer experiences. Among the critical touchpoints in this journey, the 'Customer Onboarding' process stands out. Often viewed as time-consuming and complex, customer onboarding represents a prime opportunity for digital transformation. This demonstration showcases the advantages of leveraging Confluent Cloud for customer onboarding and offers insights into how it empowers businesses to accomplish their objectives.
 
 # Overview
-This demo illustrates the data ingestion process during user signup and the subsequent production of user details and events into Confluent Cloud topics. The user data gathered from these topics will be synchronized with the Postgres database using a Postgres sink connector. The primary objective is to capture user details and facilitate account creation and login actions using Kafka-based event-driven microservices.
+This demo illustrates the data ingestion process during user signup and the subsequent production of user details and events into Confluent Cloud topics. The user data gathered from these topics will be enriched and synchronized with the Postgres database using a Postgres sink connector. The primary objective is to capture user details and facilitate account creation and login actions using Kafka-based event-driven microservices.
 
 # Architecture Diagram
 
