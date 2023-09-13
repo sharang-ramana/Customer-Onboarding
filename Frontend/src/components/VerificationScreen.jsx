@@ -19,32 +19,37 @@ const VerificationScreen = () => {
     console.log("Data from previous screen:", dataFromPreviousScreen);
 
     const timer = setTimeout(() => {
-      if (verificationStep < 2) {
+      if (verificationStep === 0) {
         setVerificationStep(verificationStep + 1);
-      } else {
+      } else if (verificationStep === 1) {
         api
-          .calculateAndVerifyCreditScore(dataFromPreviousScreen.email_id, dataFromPreviousScreen.ssn) 
+          .calculateAndVerifyCreditScore(dataFromPreviousScreen.email_id, dataFromPreviousScreen.ssn)
           .then((creditScoreResponse) => {
             console.log("Credit Score Response:", creditScoreResponse);
             if (creditScoreResponse.success) {
-              return api.sendEvent(
-                dataFromPreviousScreen.email_id,
-                "Identity and Credit Verification",
-                "success"
-              );
+              setVerificationStep(verificationStep + 1);
             } else {
               console.error("Credit Score Verification Failed");
-              throw new Error("Credit Score Verification Failed");
             }
-          })
-          .then((eventResponse) => {
-            console.log("Event Response:", eventResponse);
           })
           .catch((error) => {
             console.error("Error:", error);
           });
+      } else {
+        api
+          .sendEvent(
+            dataFromPreviousScreen.email_id,
+            "Identity and Credit Verification",
+            "success"
+          )
+          .then((eventResponse) => {
+            console.log("Event Response:", eventResponse);
+          })
+          .catch((error) => {
+            console.error("Error sending event:", error);
+          });
       }
-    }, 3000);    
+    }, 3000);       
 
     return () => clearTimeout(timer);
   }, [verificationStep, location.state, navigate]);
