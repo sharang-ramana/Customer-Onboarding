@@ -158,20 +158,20 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
 
 # Demo
 
-1. **Signup Process:**
+1. **Signup Process:**  
     Open your web browser and go to `http://localhost:3000/`. This will take you to the signup screen.
     <div align="center"> 
         <img src="images/SignupScreen.png" width="100%" height="100%">
     </div>
 
-2. **Event Tracking:**
+2. **Event Tracking:**  
     At each step of the signup form, take note that an event is produced to the `events` topic in Confluent Cloud. The record key for each event is your email ID, which you entered on the signup page.  
-    **Step 1**
+    **Step 1:**
     <div align="center"> 
         <img src="images/signup-step-1.jpg" width="100%" height="100%">
     </div>
 
-    **Step 2**
+    **Step 2:**
     <div align="center"> 
         <img src="images/signup-step-2.jpg" width="100%" height="100%">
     </div>
@@ -181,33 +181,33 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
         <img src="images/signup-credit-check.jpg" width="100%" height="100%">
     </div>
 
-    **Step 3**
+    **Step 3:**
     <div align="center"> 
         <img src="images/signup-step-3.jpg" width="100%" height="100%">
     </div>
 
-    **Step 4**
+    **Step 4:**
     <div align="center"> 
         <img src="images/signup-step-4.jpg" width="100%" height="100%">
     </div>
 
-    **Step 5**
+    **Step 5:**
     <div align="center"> 
         <img src="images/signup-step-5.jpg" width="100%" height="100%">
     </div>
 
-    **Step 6**
+    **Step 6:**
     <div align="center"> 
         <img src="images/signup-step-6.jpg" width="100%" height="100%">
     </div>
 
-3. **Customer Data Recording:**
+3. **Customer Data Recording:**  
     On the final step of the signup process, you'll notice that a record containing the user details you entered is added to the `customer` topic in Confluent Cloud. Once again, the record key is your email ID.
     <div align="center"> 
         <img src="images/signup-step-7.jpg" width="100%" height="100%">
     </div>
 
-4. **Data Streams with ksqlDB**
+4. **Data Streams with ksqlDB:**  
     Now that you have data flowing through Confluent, you can now easily build stream processing applications using ksqlDB. You are able to continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
 
     In this step, we will generate data using KTables, where we will merge user data from two topics, namely `customer` and `credit_score` into a unified topic using a simple SQL-like commands.
@@ -292,7 +292,7 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
             select * from `customer_enriched_table` EMIT CHANGES;
         ```
 
-5. **Database Entry:**
+5. **Database Entry:**  
     Check the Postgres sink connector created as part of the Terraform setup. This step retrieves data from the `customer` and `customer_enriched` topics and inserts it into the `customer` and `customer_enriched` table of postgres.  
     
     You should now see an entry in the `customer` table that matches the details you provided on the UI.
@@ -305,7 +305,7 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
         <img src="images/postgres-enriched-customer-entry.png" width="100%" height="100%">
     </div>
 
-6. **Login:**
+6. **Login:**  
     Proceed to the login page in the UI. Enter the customer's email and password, then click the `Login` button to successfully log in.
     <div align="center"> 
         <img src="images/login.jpg" width="100%" height="100%">
