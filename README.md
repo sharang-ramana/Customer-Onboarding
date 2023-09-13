@@ -1,3 +1,7 @@
+<div align="center" padding=25px>
+    <img src="images/confluent.png" width=50% height=50%>
+</div>
+
 # Supercharge Customer Onboarding with Event-Driven Microservices and Confluent Cloud
 In today's fast-paced digital landscape, organizations from various industries are harnessing technology to deliver exceptional customer experiences. Among the critical touchpoints in this journey, the 'Customer Onboarding' process stands out. Often viewed as time-consuming and complex, customer onboarding represents a prime opportunity for digital transformation. This demonstration showcases the advantages of leveraging Confluent Cloud for customer onboarding and offers insights into how it empowers businesses to accomplish their objectives.
 
@@ -150,7 +154,7 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
         cd Backend
         mvn spring-boot:run
         ```
-        Now the Backend should be exposed via `8080` port `http://localhost:8080/` and also the `customer` table will be created in the postgres database with necessary columns.
+        Now the Backend should be exposed via `8080` port `http://localhost:8080/` and also the empty `customer` and `customer_enriched` table will be created in the postgres database with necessary columns.
 
 # Demo
 
@@ -159,7 +163,6 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
     <div align="center"> 
         <img src="images/SignupScreen.png" width="100%" height="100%">
     </div>
-    Fill in the required details on each screen and proceed until you reach the final step, where you'll see the message `Your account is created successfully!`
 
 2. **Event Tracking:**
     At each step of the signup form, take note that an event is produced to the `events` topic in Confluent Cloud. The record key for each event is your email ID, which you entered on the signup page.  
@@ -171,6 +174,11 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
     **Step 2**
     <div align="center"> 
         <img src="images/signup-step-2.jpg" width="100%" height="100%">
+    </div>
+
+    After submitting your SSN and consents, you will observe the identity and credit checks being conducted. While the credit check verification is in progress, you will be able to view the user's credit score (simulated implementation of Credit Bureau) being sent to a `credit_score` topic.
+    <div align="center"> 
+        <img src="images/signup-credit-check.jpg" width="100%" height="100%">
     </div>
 
     **Step 3**
@@ -199,16 +207,126 @@ With these prerequisites in place, you'll be ready to explore and run the demo s
         <img src="images/signup-step-7.jpg" width="100%" height="100%">
     </div>
 
-4. **Database Entry:**
-    Check the Postgres sink connector created as part of the Terraform setup. It retrieves data from the customer topic and inserts it into the customer table. You should now see an entry in the customer table that matches the details you provided on the UI.
+4. **Data Streams with ksqlDB**
+    Now that you have data flowing through Confluent, you can now easily build stream processing applications using ksqlDB. You are able to continuously transform, enrich, join, and aggregate your data using simple SQL syntax. You can gain value from your data directly from Confluent in real-time. Also, ksqlDB is a fully managed service within Confluent Cloud with a 99.9% uptime SLA. You can now focus on developing services and building your data pipeline while letting Confluent manage your resources for you.
+
+    In this step, we will generate data using KTables, where we will merge user data from two topics, namely `customer` and `credit_score` into a unified topic using a simple SQL-like commands.
+
+    If you’re interested in learning more about ksqlDB and the differences between streams and tables, I recommend reading these two blogs [here](https://www.confluent.io/blog/kafka-streams-tables-part-3-event-processing-fundamentals/) and [here](https://www.confluent.io/blog/how-real-time-stream-processing-works-with-ksqldb/).
+
+    1. On the navigation menu click on **ksqlDB** and step into the cluster you created during setup.
+   To write streaming queries against topics, you will need to register the topics with ksqlDB as a stream or table.
+
+    2. **VERY IMPORTANT** -- At the bottom of the editor, set `auto.offset.reset` to `earliest`, or enter the statement:
+
+        ```SQL
+            SET 'auto.offset.reset' = 'earliest';
+        ```
+
+        If you use the default value of `latest`, then ksqlDB will read form the tail of the topics rather than the beginning, which means streams and tables won't have all the data you think they should.
+
+    3. Create a `customer_table` table which will hold the customer data present in `customer` topic.
+
+        ```SQL
+            CREATE TABLE `customer_table` (
+                `full_name` STRING, 
+                `dob` BIGINT, 
+                `gender` STRING, 
+                `email_id` STRING PRIMARY KEY, 
+                `phone` STRING, 
+                `address` STRING, 
+                `ssn` STRING, 
+                `is_consents_agreed` STRING, 
+                `is_identity_verified` BOOLEAN, 
+                `is_credit_check_verified` BOOLEAN, 
+                `security_question` STRING, 
+                `security_answer` STRING, 
+                `password` STRING
+            ) 
+            WITH (
+                KAFKA_TOPIC='customer', 
+                VALUE_FORMAT='JSON_SR'
+            );
+        ```
+    4. Create a `credit_score_table` table which will hold the credit score of the customer present in `credit_score` topic.
+
+        ```SQL
+            CREATE TABLE `credit_score_table` (
+                `email_id` STRING PRIMARY KEY, 
+                `ssn` STRING, 
+                `credit_score` INTEGER
+            ) 
+            WITH (
+                KAFKA_TOPIC='credit_score', 
+                VALUE_FORMAT='JSON_SR'
+            );
+        ```
+    5. Establish a `customer_enriched_table` to store the ultimate enriched customer data by merging information from both the `credit_score_table` and `customer_table`.
+
+        ```SQL
+            CREATE TABLE `customer_enriched_table` WITH (KAFKA_TOPIC='customer_enriched') AS
+            SELECT 
+                C.`full_name` AS `full_name`,
+                C.`dob` AS `dob`,
+                C.`gender` AS `gender`,
+                C.`email_id` AS `email_id_pk`,
+                AS_VALUE(C.`email_id`) AS `email_id`, 
+                C.`phone` AS `phone`,
+                C.`address` AS `address`,
+                C.`ssn` AS `ssn`,
+                C.`is_consents_agreed` AS `is_consents_agreed`,
+                C.`is_identity_verified` AS `is_identity_verified`,
+                C.`is_credit_check_verified` AS `is_credit_check_verified`,
+                C.`security_question` AS `security_question`,
+                C.`security_answer` AS `security_answer`,
+                C.`password` AS `password`,
+                CS.`credit_score` AS `credit_score`
+            FROM "customer_table" C
+            INNER JOIN "credit_score_table" CS
+            ON C.`email_id` = CS.`email_id`;
+        ```
+
+    6. Now the enriched data should be flowing through the `customer_enriched` topic. You can also verify the output of the final enriched table by executing the following command in the KSQL editor.
+
+        ```SQL
+            select * from `customer_enriched_table` EMIT CHANGES;
+        ```
+
+5. **Database Entry:**
+    Check the Postgres sink connector created as part of the Terraform setup. This step retrieves data from the `customer` and `customer_enriched` topics and inserts it into the `customer` and `customer_enriched` table of postgres.  
+    
+    You should now see an entry in the `customer` table that matches the details you provided on the UI.
     <div align="center"> 
         <img src="images/postgres-customer-entry.png" width="100%" height="100%">
     </div>
 
-5. **Login:**
+    You should also see an entry in the `customer_enriched` table that holds the customer data with credit_score
+    <div align="center"> 
+        <img src="images/postgres-enriched-customer-entry.png" width="100%" height="100%">
+    </div>
+
+6. **Login:**
     Proceed to the login page in the UI. Enter the customer's email and password, then click the `Login` button to successfully log in.
     <div align="center"> 
         <img src="images/login.jpg" width="100%" height="100%">
+    </div>
+
+# Confluent Cloud Stream Governance
+
+Confluent offers data governance tools such as Stream Quality, Stream Catalog, and Stream Lineage in a package called Stream Governance. These features ensure your data is high quality, observable and discoverable. Learn more about **Stream Governance** [here](https://www.confluent.io/product/stream-governance/) and refer to the [docs](https://docs.confluent.io/cloud/current/stream-governance/overview.html) page for detailed information.
+
+1.  Visit https://confluent.cloud and access your environment and cluster.
+2.  Use the left hand-side menu and click on **Stream Lineage**.
+    Stream lineage provides a graphical UI of the end to end flow of your data. Both from the a bird’s eye view and drill-down magnification for answering questions like:
+
+    - Where did data come from?
+    - Where is it going?
+    - Where, when, and how was it transformed?
+
+3. In our specific scenario, the stream lineage is depicted as follows: We employ a Java producer to produce records, which are then dispatched to three distinct topics: events, customer, and credit_score. On the customer and credit_score topics, we construct KSQLDB tables and amalgamate the information to construct an enriched table. Subsequently, both this customer and enriched data is transferred to the Postgres Sink Connector.
+
+    <div align="center">
+    <img src="images/stream-lineage.jpg" width =100% heigth=100%>
     </div>
 
 # Teardown
@@ -218,3 +336,10 @@ If you wish to remove all resources created during the demo to avoid additional 
    terraform destroy
    ```
 This will delete all resources provisioned by Terraform.
+
+# References
+1. Confluent Cloud cluster types [page](https://docs.confluent.io/cloud/current/clusters/cluster-types.html)
+2. ksqlDB [page](https://www.confluent.io/product/ksqldb/) and [use cases](https://developer.confluent.io/tutorials/#explore-top-use-cases)
+3. Stream Governance [page](https://www.confluent.io/product/stream-governance/) and [doc](https://docs.confluent.io/cloud/current/stream-governance/overview.html)
+4. RBAC in Confluent Cloud [page](https://docs.confluent.io/cloud/current/access-management/access-control/rbac/overview.html)
+5. Terraform provider for Confluent [page](https://registry.terraform.io/providers/confluentinc/confluent/latest/docs)
