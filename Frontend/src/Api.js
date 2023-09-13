@@ -40,4 +40,21 @@ export const api = {
 
     return response.json();
   },
+
+  calculateAndVerifyCreditScore: async (email_id, ssn) => {
+    const creditScoreData = {
+      email_id,
+      ssn,
+    };
+
+    const response = await fetch(`${BASE_URL}/creditscore`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(creditScoreData),
+    });
+
+    return response.json();
+  },
 };

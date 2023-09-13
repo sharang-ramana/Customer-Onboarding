@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 @RequestMapping("/api")
@@ -28,7 +29,6 @@ public class KafkaController {
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> signup(@RequestBody SignupRequest signupRequest) {
-        System.out.println(signupRequest.getDob());
         try {
             if (signupRequest.getEmail_id() == null || signupRequest.getEmail_id().isEmpty()) {
                 throw new IllegalArgumentException("Email ID is a mandatory field.");
@@ -132,5 +132,32 @@ public class KafkaController {
             return false;
         }
     }
+
+    @PostMapping("/creditscore")
+    public ResponseEntity<ApiResponse> calculateCreditScore(@RequestBody CreditScoreRequest creditScoreRequest) {
+        try {
+            if (creditScoreRequest.getEmail_id() == null || creditScoreRequest.getEmail_id().isEmpty()) {
+                throw new IllegalArgumentException("Email ID is a mandatory field.");
+            }
+
+            // Generate a random credit score between 500 and 850
+            int randomCreditScore = ThreadLocalRandom.current().nextInt(500, 851);
+
+            CreditScoreResponse creditScoreResponse = new CreditScoreResponse(creditScoreRequest.getEmail_id(), creditScoreRequest.getSsn(), randomCreditScore);
+
+            kafkaProducerService.sendMessage(creditScoreRequest.getEmail_id(), creditScoreResponse, "credit_score");
+
+            ApiResponse response = new ApiResponse();
+            response.setSuccess(true);
+            response.setMessage("Credit score calculated and sent successfully.");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse response = new ApiResponse();
+            response.setSuccess(false);
+            response.setError("Error occurred while sending credit score to Kafka.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
 }
 

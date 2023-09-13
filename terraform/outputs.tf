@@ -2,7 +2,7 @@ output "resource-ids" {
   value = <<-EOT
   Environment ID:           ${confluent_environment.development.id}
   Kafka Cluster ID:         ${confluent_kafka_cluster.standard.id}
-  Kafka topic names:        ${confluent_kafka_topic.customer.topic_name}, ${confluent_kafka_topic.customer_enriched.topic_name}, ${confluent_kafka_topic.events.topic_name}
+  Kafka topic names:        ${confluent_kafka_topic.customer.topic_name}, ${confluent_kafka_topic.customer_enriched.topic_name}, ${confluent_kafka_topic.credit_score.topic_name}, ${confluent_kafka_topic.events.topic_name}
   Bootstap Server Endpoint: ${confluent_kafka_cluster.standard.bootstrap_endpoint}
 
   Service Accounts and their Kafka API Keys (API Keys inherit the permissions granted to the owner):

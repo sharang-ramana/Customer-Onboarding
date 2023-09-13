@@ -23,19 +23,28 @@ const VerificationScreen = () => {
         setVerificationStep(verificationStep + 1);
       } else {
         api
-          .sendEvent(
-            dataFromPreviousScreen.email_id,
-            "Identity and Credit Verification",
-            "success"
-          )
+          .calculateAndVerifyCreditScore(dataFromPreviousScreen.email_id, dataFromPreviousScreen.ssn) 
+          .then((creditScoreResponse) => {
+            console.log("Credit Score Response:", creditScoreResponse);
+            if (creditScoreResponse.success) {
+              return api.sendEvent(
+                dataFromPreviousScreen.email_id,
+                "Identity and Credit Verification",
+                "success"
+              );
+            } else {
+              console.error("Credit Score Verification Failed");
+              throw new Error("Credit Score Verification Failed");
+            }
+          })
           .then((eventResponse) => {
             console.log("Event Response:", eventResponse);
           })
           .catch((error) => {
-            console.error("Error sending event:", error);
+            console.error("Error:", error);
           });
       }
-    }, 3000);
+    }, 3000);    
 
     return () => clearTimeout(timer);
   }, [verificationStep, location.state, navigate]);

@@ -108,6 +108,19 @@ resource "confluent_kafka_topic" "customer_enriched" {
   }
 }
 
+resource "confluent_kafka_topic" "credit_score" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  topic_name         = "credit_score"
+  partitions_count   = 6
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
 resource "confluent_kafka_topic" "events" {
   kafka_cluster {
     id = confluent_kafka_cluster.standard.id
@@ -425,6 +438,24 @@ resource "confluent_kafka_acl" "ksql-manager-for-customer_enriched-topic" {
   }
 }
 
+resource "confluent_kafka_acl" "ksql-manager-for-credit_score-topic" {
+  kafka_cluster {
+    id = confluent_kafka_cluster.standard.id
+  }
+  resource_type = "TOPIC"
+  resource_name = confluent_kafka_topic.credit_score.topic_name
+  pattern_type  = "PREFIXED"
+  principal     = "User:${confluent_service_account.ksql-manager.id}"
+  host          = "*"
+  operation     = "ALL"
+  permission    = "ALLOW"
+  rest_endpoint = confluent_kafka_cluster.standard.rest_endpoint
+  credentials {
+    key    = confluent_api_key.app-manager-kafka-kafka-api-key.id
+    secret = confluent_api_key.app-manager-kafka-kafka-api-key.secret
+  }
+}
+
 resource "confluent_role_binding" "ksql-manager-schema-registry-resource-owner" {
   principal   = "User:${confluent_service_account.ksql-manager.id}"
   role_name   = "ResourceOwner"
@@ -507,5 +538,5 @@ resource "confluent_connector" "postgres-db-sink" {
         "transforms.transform_0.target.type" = "Date",
         "transforms.transform_0.field" = "dob"
     }
-    depends_on = [ confluent_kafka_topic.customer, confluent_kafka_topic.customer_enriched ]
+    depends_on = [ confluent_kafka_topic.customer, confluent_kafka_topic.customer_enriched, confluent_kafka_topic.credit_score ]
 }
