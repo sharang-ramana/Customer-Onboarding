@@ -30,7 +30,7 @@ In this demonstration, we will explore the signup and login flows, utilizing Rea
 
 To ensure a smooth and successful experience with this demo, please make sure you have the following tools and accounts set up:
 
-- **Confluent Cloud Account**: You'll need a Confluent Cloud account. If you don't have one, you can sign up for a free trial [here](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli).
+- **Confluent Cloud Account**: You'll need a Confluent Cloud account. If you don't have one, you can sign up for a free trial [here](https://www.confluent.io/confluent-cloud/tryfree/).
     - After verifying your email address, access Confluent Cloud sign-in by navigating [here](https://confluent.cloud).
     - When provided with the _username_ and _password_ prompts, fill in your credentials.
     
